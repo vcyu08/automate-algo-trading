@@ -16,6 +16,7 @@ def pairs_trading_algo(self):
     
     #The mail addresses and password
     sender_address = os.environ['GMAIL_ACCOUNT']
+    print(sender_address)
     sender_pass = os.environ['GMAIL_PASSWORD']
     receiver_address = os.environ['RECEIVER_EMAIL']
     #Setup the MIME
