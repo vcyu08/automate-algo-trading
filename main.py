@@ -1,0 +1,3 @@
+from automate_algo_trading import pairs_trading_algo
+
+pairs_trading_algo()
