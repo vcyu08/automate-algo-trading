@@ -6,7 +6,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
-def pairs_trading_algo(self):
+def pairs_trading_algo():
     
     #Specify paper trading environment 
     # os.environ["APCA_API_BASE_URL"] = "https://paper-api.alpaca.markets"
