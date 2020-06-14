@@ -2,10 +2,6 @@ import os
 import alpaca_trade_api as tradeapi
 import pandas as pd
 import requests
-import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-
 
 def pairs_trading_algo():
     
@@ -111,6 +107,7 @@ def pairs_trading_algo():
 
     domain_name = os.environ.get('MAILGUN_DOMAIN')
     api_key = os.environ.get('MAILGUN_API_KEY')
+    from_address = f"Trade Bot <mailgun@{domain_name}>"
     receiver_email_address = os.environ.get('RECEIVER_EMAIL')
     subject = 'Pairs Trading Algo'
     response = send_message(
@@ -122,13 +119,12 @@ def pairs_trading_algo():
 
     return response
 
-def send_message(domain_name, api_key, receiver_email_address, subject, mail_content):
+def send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content):
     url = f"https://api.mailgun.net/v3/{domain_name}/messages"
-    from = f"Trade Bot <mailgun@{domain_name}>"
     return requests.post(
         url,
         auth=("api", api_key),
-        data={"from": from,
+        data={"from": from_address,
               "to": receiver_email_address,
               "subject": subject,
               "text": mail_content})
