@@ -14,8 +14,8 @@ def pairs_trading_algo():
         
     #Selection of stocks
     days = 1000
-    stock2 = 'MSFT'
-    stock1 = 'AAPL'
+    stock1 = 'MSFT'
+    stock2 = 'AAPL'
     #Put Hisrorical Data into variables
     stock1_barset = api.get_barset(stock1,'day',limit=days)
     stock2_barset = api.get_barset(stock2,'day',limit=days)
@@ -125,7 +125,7 @@ def pairs_trading_algo():
     from_address = f"Trade Bot <mailgun@{domain_name}>"
     receiver_email_address = os.environ.get('RECEIVER_EMAIL')
     subject = 'Pairs Trading Algo'
-    # send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content)
+    send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content)
     return True
 
 def send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content):
