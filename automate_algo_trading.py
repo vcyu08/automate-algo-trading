@@ -113,6 +113,7 @@ def pairs_trading_algo():
     response = send_message(
         domain_name,
         api_key,
+        from_address,
         receiver_email_address,
         subject,
         mail_content)
