@@ -10,11 +10,12 @@ def pairs_trading_algo():
     #Insert API Credentials 
     api = tradeapi.REST() # or use ENV Vars shown below
     account = api.get_account()
+    print(account.status)
         
     #Selection of stocks
     days = 1000
-    stock1 = 'MSFT'
-    stock2 = 'AAPL'
+    stock2 = 'MSFT'
+    stock1 = 'AAPL'
     #Put Hisrorical Data into variables
     stock1_barset = api.get_barset(stock1,'day',limit=days)
     stock2_barset = api.get_barset(stock2,'day',limit=days)
@@ -41,35 +42,50 @@ def pairs_trading_algo():
     hist_close[stock2] = data_2
     #Current Spread between the two stocks
     stock1_curr = data_1[days-1]
+    print('stock1_curr', stock1_curr)
     stock2_curr = data_2[days-1]
+    print('stock2_curr', stock2_curr)    
     spread_curr = (stock1_curr-stock2_curr)
+    print('spread_curr', spread_curr)
     #Moving Average of the two stocks
     move_avg_days = 5
     #Moving averge for stock1
     stock1_last = []
     for i in range(move_avg_days):
         stock1_last.append(data_1[(days-1)-i])
-
+    print(stock1_last)
     stock1_hist = pd.DataFrame(stock1_last)
-
+    print('stock1_hist', stock1_hist)
     stock1_mavg = stock1_hist.mean()
+    print('stock1_mavg', stock1_mavg)
     #Moving average for stock2
     stock2_last = []
     for i in range(move_avg_days):
         stock2_last.append(data_2[(days-1)-i])
+    print(stock2_last)
     stock2_hist = pd.DataFrame(stock2_last)
+    print('stock2_hist', stock2_hist)
     stock2_mavg = stock2_hist.mean()
+    print('stock2_mavg', stock2_mavg)
     #Sread_avg
+    print(stock1_mavg - stock2_mavg)
     spread_avg = min(stock1_mavg - stock2_mavg)
+    print('spread_avg', spread_avg)
     #Spread_factor
     spreadFactor = .01
     wideSpread = spread_avg*(1+spreadFactor)
+    print('wideSpread', wideSpread)
     thinSpread = spread_avg*(1-spreadFactor)
+    print('thinSpread', thinSpread)
     #Calc_of_shares_to_trade
     cash = float(account.buying_power)
+    print('cash', cash)
     limit_stock1 = cash//stock1_curr
+    print('limit_stock1', limit_stock1)
     limit_stock2 = cash//stock2_curr
+    print('limit_stock2', limit_stock2)
     number_of_shares = int(min(limit_stock1, limit_stock2)/2)
+    print('number_of_shares', number_of_shares)
     
     #Trading_algo
     portfolio = api.list_positions()
@@ -104,21 +120,13 @@ def pairs_trading_algo():
     else:
         mail_content = "The Market is Closed"
         
-
     domain_name = os.environ.get('MAILGUN_DOMAIN')
     api_key = os.environ.get('MAILGUN_API_KEY')
     from_address = f"Trade Bot <mailgun@{domain_name}>"
     receiver_email_address = os.environ.get('RECEIVER_EMAIL')
     subject = 'Pairs Trading Algo'
-    response = send_message(
-        domain_name,
-        api_key,
-        from_address,
-        receiver_email_address,
-        subject,
-        mail_content)
-
-    return response
+    # send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content)
+    return True
 
 def send_message(domain_name, api_key, from_address, receiver_email_address, subject, mail_content):
     url = f"https://api.mailgun.net/v3/{domain_name}/messages"
