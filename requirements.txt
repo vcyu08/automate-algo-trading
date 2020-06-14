@@ -1,1 +1,2 @@
 alpaca-trade-api>=0.25
+requests>=2.23.0

@@ -1,6 +1,7 @@
 import os
 import alpaca_trade_api as tradeapi
 import pandas as pd
+import requests
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -13,18 +14,7 @@ def pairs_trading_algo():
     #Insert API Credentials 
     api = tradeapi.REST() # or use ENV Vars shown below
     account = api.get_account()
-    
-    #The mail addresses and password
-    sender_address = os.environ['GMAIL_ACCOUNT']
-    print(sender_address)
-    sender_pass = os.environ['GMAIL_PASSWORD']
-    receiver_address = os.environ['RECEIVER_EMAIL']
-    #Setup the MIME
-    message = MIMEMultipart()
-    message['From'] = 'Trading Bot'
-    message['To'] = receiver_address
-    message['Subject'] = 'Pairs Trading Algo'   #The subject line
-    
+        
     #Selection of stocks
     days = 1000
     stock1 = 'MSFT'
@@ -118,16 +108,27 @@ def pairs_trading_algo():
     else:
         mail_content = "The Market is Closed"
         
-    #The body and the attachments for the mail
-    message.attach(MIMEText(mail_content, 'plain'))
-    #Create SMTP session for sending the mail
-    session = smtplib.SMTP('smtp.gmail.com', 587) #use gmail with port
-    session.starttls() #enable security
-    session.login(sender_address, sender_pass) #login with mail_id and password
-    text = message.as_string()
-    session.sendmail(sender_address, receiver_address, text)
-    session.quit()
-    
-    done = 'Mail Sent'
 
-    return done
+    domain_name = os.environ.get('MAILGUN_DOMAIN')
+    api_key = os.environ.get('MAILGUN_API_KEY')
+    receiver_email_address = os.environ.get('RECEIVER_EMAIL')
+    subject = 'Pairs Trading Algo'
+    response = send_message(
+        domain_name,
+        api_key,
+        receiver_email_address,
+        subject,
+        mail_content)
+
+    return response
+
+def send_message(domain_name, api_key, receiver_email_address, subject, mail_content):
+    url = f"https://api.mailgun.net/v3/{domain_name}/messages"
+    from = f"Trade Bot <mailgun@{domain_name}>"
+    return requests.post(
+        url,
+        auth=("api", api_key),
+        data={"from": from,
+              "to": receiver_email_address,
+              "subject": subject,
+              "text": mail_content})
