@@ -22,30 +22,15 @@ def pairs_trading_algo():
     stock1_bars = stock1_barset[stock1]
     stock2_bars = stock2_barset[stock2]
     #Grab stock1 data and put in to a array
-    data_1 = []
-    times_1 = []
-    for i in range(days):
-        stock1_close = stock1_bars[i].c
-        stock1_time = stock1_bars[i].t
-        data_1.append(stock1_close)
-        times_1.append(stock1_time)
+    data_1 = [bar.c for bar in stock1_bars]
     #Grab stock2 data and put in to an array
-    data_2 = []
-    times_2 = []
-    for i in range(days):
-        stock2_close = stock2_bars[i].c
-        stock2_time = stock1_bars[i].t
-        data_2.append(stock2_close)
-        times_2.append(stock2_time)
-    #Putting them together
-    hist_close = pd.DataFrame(data_1, columns=[stock1])
-    hist_close[stock2] = data_2
+    data_2 = [bar.c for bar in stock2_bars]
     #Current Spread between the two stocks
-    stock1_curr = data_1[days-1]
+    stock1_curr = data_1[-1]
     print('stock1_curr', stock1_curr)
-    stock2_curr = data_2[days-1]
+    stock2_curr = data_2[-1]
     print('stock2_curr', stock2_curr)    
-    spread_curr = (stock1_curr-stock2_curr)
+    spread_curr = abs(stock1_curr-stock2_curr)
     print('spread_curr', spread_curr)
     #Moving Average of the two stocks
     move_avg_days = 5
@@ -69,7 +54,7 @@ def pairs_trading_algo():
     print('stock2_mavg', stock2_mavg)
     #Sread_avg
     print(stock1_mavg - stock2_mavg)
-    spread_avg = min(stock1_mavg - stock2_mavg)
+    spread_avg = abs(min(stock1_mavg - stock2_mavg))
     print('spread_avg', spread_avg)
     #Spread_factor
     spreadFactor = .01
@@ -108,9 +93,12 @@ def pairs_trading_algo():
                 api.submit_order(symbol = stock2,qty = number_of_shares,side = 'sell',type = 'market',time_in_force ='day')
                 mail_content = "Trades have been made, long top stock and short bottom stock"
         else:
-            wideTradeSpread = spread_avg *(1+spreadFactor + .03)
-            thinTradeSpread = spread_avg *(1+spreadFactor - .03)
-            if spread_curr <= wideTradeSpread and spread_curr >=thinTradeSpread:
+            wideTradeSpread = spread_avg *(1 + spreadFactor + .03)
+            print('wideTradeSpread', wideTradeSpread)
+            thinTradeSpread = spread_avg *(1 - spreadFactor - .03)
+            print('thinTradeSpread', thinTradeSpread)
+            print('spread_curr', spread_curr)
+            if thinTradeSpread <= spread_curr <= wideTradeSpread:
                 api.close_position(stock1)
                 api.close_position(stock2)
                 mail_content = "Position has been closed"
