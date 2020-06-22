@@ -76,7 +76,7 @@ def pairs_trading_algo():
     portfolio = api.list_positions()
     clock = api.get_clock()
 
-    mail_content = ''
+    mail_content = 'No trades were made, position remains closed'
 
     if clock.is_open == True:
         if bool(portfolio) == False:
