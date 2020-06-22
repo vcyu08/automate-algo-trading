@@ -39,7 +39,7 @@ def pairs_trading_algo():
     for i in range(move_avg_days):
         stock1_last.append(data_1[(days-1)-i])
     print(stock1_last)
-    stock1_hist = pd.DataFrame(stock1_last)
+    stock1_hist = pd.Series(stock1_last)
     print('stock1_hist', stock1_hist)
     stock1_mavg = stock1_hist.mean()
     print('stock1_mavg', stock1_mavg)
@@ -48,13 +48,13 @@ def pairs_trading_algo():
     for i in range(move_avg_days):
         stock2_last.append(data_2[(days-1)-i])
     print(stock2_last)
-    stock2_hist = pd.DataFrame(stock2_last)
+    stock2_hist = pd.Series(stock2_last)
     print('stock2_hist', stock2_hist)
     stock2_mavg = stock2_hist.mean()
     print('stock2_mavg', stock2_mavg)
     #Sread_avg
     print(stock1_mavg - stock2_mavg)
-    spread_avg = abs(min(stock1_mavg - stock2_mavg))
+    spread_avg = abs(stock1_mavg - stock2_mavg)
     print('spread_avg', spread_avg)
     #Spread_factor
     spreadFactor = .01
@@ -75,7 +75,9 @@ def pairs_trading_algo():
     #Trading_algo
     portfolio = api.list_positions()
     clock = api.get_clock()
-    
+
+    mail_content = ''
+
     if clock.is_open == True:
         if bool(portfolio) == False:
             #detect a wide spread
